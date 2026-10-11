@@ -22,3 +22,59 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# ---------------------------------------------
+# Database & SQL Local Dumps
+# ---------------------------------------------
+*.sql.bak
+*.dump
+local_env.sql
+*.log
+
+# ---------------------------------------------
+# IDE & System Files
+# ---------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ---------------------------------------------
+# Frontend (React / Vite - For V2)
+# ---------------------------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# ---------------------------------------------
+# Secrets & Environment Variables
+# ---------------------------------------------
+*.env
+application-local.properties
+application-local.yml
+cat << 'EOF' > .gitignore
+# System & Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Database dumps and local credentials
+*.log
+*.sql.bak
+local_env.sql
+
+# Java / Spring Boot build artifacts (for future V2)
+target/
+build/
+*.class
+*.jar
+
+# Node / Frontend build artifacts (for future V2)
+node_modules/
+dist/
+.env
+EOF
