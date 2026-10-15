@@ -1,0 +1,3 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { Overview } from '@/features/homefolio/Overview';
+export const Route=createFileRoute('/')({head:()=>({meta:[{title:'HomeFolio — Household Overview'},{name:'description',content:'A clearer picture of your family finances. Track budgets, accounts, shared expenses and savings in HomeFolio.'},{property:'og:title',content:'HomeFolio — Household Overview'},{property:'og:description',content:'Your family finances, thoughtfully together.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:Overview});
