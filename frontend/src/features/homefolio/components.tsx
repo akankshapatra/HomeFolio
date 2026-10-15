@@ -1,4 +1,4 @@
-import { useState,type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowUpRight,ArrowDownRight,Wallet,MoreHorizontal,Plane,Wifi,Check,ArrowRight,Search,ArrowUpDown,Utensils,ShoppingBasket,Zap,Home,Car,Heart,Plus } from 'lucide-react';
 import { AreaChart,Area,ResponsiveContainer,BarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip } from 'recharts';
@@ -12,7 +12,59 @@ export function MetricCard({label,icon,children}:{label:string;icon:ReactNode;ch
 export function Sparkline(){return <div className="sparkline" aria-label="Net worth increased over the last 30 days"><ResponsiveContainer width="100%" height="100%"><AreaChart data={[28,31,29,35,32,40,37,43,40,42,45,42,49,47,56,53,57,60,58,65].map((v,i)=>({v,i}))}><Area type="monotone" dataKey="v" stroke="var(--primary)" strokeWidth={1.7} fill="var(--primary)" fillOpacity={.07} isAnimationActive={false}/></AreaChart></ResponsiveContainer></div>}
 export function BudgetProgress({actual,limit,name}:{actual:number;limit:number;name?:string}){const percentage=Math.round(actual/limit*100);return <div className={percentage>100?'negative':percentage>=85?'warning':''}>{name&&<div className="budget-row-top"><span className="text-foreground">{name}</span><span>{percentage}%</span></div>}<div className="progress-track"><progress value={Math.min(actual,limit)} max={limit} aria-label={`${name??'Budget'} ${percentage}% utilized`}/></div></div>}
 export function PanelHeader({title,icon,link,to}:{title:string;icon?:ReactNode;link?:string;to?:'/'|'/accounts'|'/budgets'|'/splits'|'/goals'|'/bills'|'/audit'|'/transactions'}){return <div className="panel-header"><h2 className="panel-title">{icon}{title}</h2>{to&&<Link to={to} className="panel-link">{link??'View all'}<ArrowUpRight/></Link>}</div>}
-export function BudgetBreakdown(){const {state,month}=useFinance();const data=budgetData(state,month);return <section className="panel span-8"><PanelHeader title="Budget Breakdown vs Actual" icon={<Wallet/>} link="Manage budgets" to="/budgets"/><div className="budget-body"><div className="chart-legend"><span><i className="legend-dot budget"/>Budget</span><span><i className="legend-dot"/>Actual spending</span></div><div className="budget-chart"><ResponsiveContainer width="100%" height="100%"><BarChart data={data} barGap={4} margin={{top:5,right:0,bottom:0,left:0}}><CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 3"/><XAxis dataKey="name" axisLine={false} tickLine={false}/><YAxis axisLine={false} tickLine={false} tickFormatter={v=>`₹${v/1000}k`} width={48}/><Tooltip formatter={(v:number)=>currency(v)} cursor={{fill:'var(--secondary)',opacity:.25}}/><Bar name="Budget" dataKey="limit" fill="var(--secondary)" radius={[3,3,0,0]} maxBarSize={22} isAnimationActive={false}/><Bar name="Actual" dataKey="actual" fill="var(--primary)" radius={[3,3,0,0]} maxBarSize={22} isAnimationActive={false}/></BarChart></ResponsiveContainer></div><div className="budget-list">{data.map(b=><div className="budget-row" key={b.name}><BudgetProgress name={b.name} actual={b.actual} limit={b.limit}/><div className="budget-row-top text-muted-foreground"><span><CurrencyValue value={b.actual}/> / <CurrencyValue value={b.limit}/></span>{b.actual>b.limit?<span className="negative">Over budget</span>:b.actual/b.limit>=.85?<span className="warning">Near limit</span>:<span>On track</span>}</div></div>)}</div></div></section>}
+// (Keep existing imports at the top)
+export function BudgetBreakdown(){
+  const {state,month}=useFinance();
+  const data=budgetData(state,month);
+  return (
+    <section className="panel span-8">
+      <PanelHeader title="Budget Breakdown vs Actual" icon={<Wallet/>} link="Manage budgets" to="/budgets"/>
+      <div className="budget-body">
+        <div className="chart-legend">
+          <span><i className="legend-dot budget"/>Budget</span>
+          <span><i className="legend-dot"/>Actual spending</span>
+        </div>
+        <div className="budget-chart">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} barGap={4} margin={{top:5,right:0,bottom:0,left:0}}>
+              <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 3"/>
+              <XAxis dataKey="name" axisLine={false} tickLine={false}/>
+              <YAxis axisLine={false} tickLine={false} tickFormatter={v=>`₹${v/1000}k`} width={48}/>
+              <Tooltip formatter={(v:number)=>currency(v)} cursor={{fill:'var(--secondary)',opacity:.25}}/>
+              <Bar 
+                name="Budget" 
+                dataKey="limit" 
+                fill="var(--color-budget-bar)" 
+                radius={[3,3,0,0]} 
+                maxBarSize={22} 
+                isAnimationActive={false}
+              />
+              <Bar 
+                name="Actual" 
+                dataKey="actual" 
+                fill="var(--primary)" 
+                radius={[3,3,0,0]} 
+                maxBarSize={22} 
+                isAnimationActive={false}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="budget-list">
+          {data.map(b=>(
+            <div className="budget-row" key={b.name}>
+              <BudgetProgress name={b.name} actual={b.actual} limit={b.limit}/>
+              <div className="budget-row-top text-muted-foreground">
+                <span><CurrencyValue value={b.actual}/> / <CurrencyValue value={b.limit}/></span>
+                {b.actual>b.limit?<span className="negative">Over budget</span>:b.actual/b.limit>=.85?<span className="warning">Near limit</span>:<span>On track</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 export function AccountCard({account}:{account:Account}){return <div className="account-row"><div className="account-icon">{account.kind==='Cash wallet'?<Wallet/>:account.kind==='Credit card'?<span className="text-xs font-semibold">SBI</span>:<span className="text-xs font-semibold">H</span>}</div><div className="min-w-0"><div className="account-name truncate">{account.name}</div><div className="account-sub">{account.masked}</div></div><div className="account-amount"><CurrencyValue value={Math.abs(account.balance)}/><div className={`account-sub ${account.balance<0?'negative':''}`}>{account.balance<0?'Outstanding':'Available balance'}</div></div></div>}
 export function AccountsPanel(){const {state}=useFinance();return <section className="panel span-4"><PanelHeader title="Accounts & Cards" icon={<Wallet/>} to="/accounts"/><div className="account-list">{state.accounts.map(a=><AccountCard key={a.id} account={a}/>)}{!state.accounts.length&&<div className="empty-state">No accounts yet</div>}</div><div className="accounts-total"><span>Total liquid balance</span><CurrencyValue className="text-foreground" value={state.accounts.filter(a=>a.balance>0).reduce((s,a)=>s+a.balance,0)}/></div><div className="px-5 pb-4 text-[9px] text-muted-foreground flex items-center gap-2"><span className="status-dot"/>{state.accounts.length?'Manually tracked · no bank connection':'Add your first account'}</div></section>}
 export function TransactionTable({compact=false}:{compact?:boolean}){const {state,month}=useFinance();const [search,setSearch]=useState('');const [category,setCategory]=useState('all');const [type,setType]=useState('all');const [sort,setSort]=useState('date');const rows=state.transactions.filter(t=>t.date.startsWith(month)&&t.description.toLowerCase().includes(search.toLowerCase())&&(category==='all'||t.category===category)&&(type==='all'||t.type===type)).sort((a,b)=>sort==='amount'?b.amount-a.amount:b.date.localeCompare(a.date));const shown=compact?rows.slice(0,6):rows;

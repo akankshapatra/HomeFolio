@@ -8,13 +8,12 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
-import { FinanceProvider } from '@/features/homefolio/store';
-import { Shell } from '@/features/homefolio/Shell';
-import { Toaster } from 'sonner';
+import { FinanceProvider } from "@/features/homefolio/store";
+import { Shell } from "@/features/homefolio/Shell";
+import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -39,11 +38,8 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
-  console.error(error);
+  console.error("Application error boundary triggered:", error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -81,22 +77,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "HomeFolio" },
-      { name: "description", content: "Family finances, thoughtfully together." },
-      
-      { property: "og:title", content: "HomeFolio" },
-      { property: "og:description", content: "Family finances, thoughtfully together." },
+      { title: "HomeFolio — Family Finance Management System" },
+      { name: "description", content: "One Family. One Financial Picture. Unified household financial management." },
+      { property: "og:title", content: "HomeFolio — Family Finance Management System" },
+      { property: "og:description", content: "One Family. One Financial Picture. Unified household financial management." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      
     ],
     links: [
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;650;700&family=JetBrains+Mono:wght@400;500;600&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;650;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
@@ -124,8 +121,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <FinanceProvider><Shell><Outlet /></Shell><Toaster position="bottom-right" theme="system" /></FinanceProvider> breaks all child routes. */}
-      <FinanceProvider><Shell><Outlet /></Shell><Toaster position="bottom-right" theme="system" /></FinanceProvider>
+      <FinanceProvider>
+        <Shell>
+          <Outlet />
+        </Shell>
+        <Toaster position="bottom-right" theme="system" />
+      </FinanceProvider>
     </QueryClientProvider>
   );
 }
